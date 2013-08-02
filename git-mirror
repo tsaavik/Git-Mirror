@@ -8,7 +8,7 @@
 #
 #  To start Mirroring a new GIT repo:
 #    cd /your/toplevel/git/dir
-#    git clone --mirror git@github.com:defensio/REPONAME
+#    git clone --mirror git@github.com:YOURGITNAME/REPONAME
 #
 # Example cron entry for keeping mirrors up to date once a day:
 #   23 4 * * * /usr/local/bin/git-mirror /home/yourname/gitmirrors/ >>/var/log/git-mirror.log 2>&1
