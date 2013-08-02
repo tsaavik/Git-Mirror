@@ -1,0 +1,49 @@
+#!/bin/bash
+#
+# Git-Mirror - Gets latest updates for all git clones in a directory
+# David Mcanulty 2013
+#
+# Requires: Cron - for updates
+#            git - for doing git operations
+#
+#  To start Mirroring a new GIT repo:
+#    cd /your/toplevel/git/dir
+#    git clone --mirror git@github.com:defensio/REPONAME
+#
+# Example cron entry for keeping mirrors up to date once a day:
+#   23 4 * * * /usr/local/bin/git-mirror /home/yourname/gitmirrors/ >>/var/log/git-mirror.log 2>&1
+#
+mirror_dir=$1
+exitcode=0
+if [[ ! -d "${mirror_dir}" ]] || [[ -z "${mirror_dir}" ]] ;then
+   echo "(${mirror_dir}) is empty or not a directory"
+   echo "This script requires a directory to mirror within"
+   echo "for example: /home/yourname/gitmirrors/"
+   exit 1
+fi
+
+if [[ $(whoami) == "root" ]] ;then
+  echo "You must not run this script as root"
+  exit 1
+fi
+
+# Loop over directories in $mirror_dir and
+# if they are valid git mirrors (have a 'HEAD' file in them).
+# update them with git remote update
+echo "reading directories from ${mirror_dir} at $(date)"
+while IFS= read -r gitdir; do
+   # Check that this is a valid git mirror directory
+   if [[ -s "$gitdir/HEAD" ]] ;then
+      if git --git-dir ${gitdir} remote update ;then
+         echo "Successfully mirrored: $gitdir at $(date)"
+      else
+         echo "git mirror failed on ${gitdir} with error code $?"
+         exitcode+=1
+      fi
+   else
+      echo "no HEAD found in ${gitdir}, perhaps this isn't a git directory?"
+      exitcode+=1
+   fi
+done < <(find "${mirror_dir}" -maxdepth 1 -mindepth 1 -type d -print)
+
+exit ${exitcode}
