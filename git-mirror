@@ -22,10 +22,11 @@ if [[ ! -d "${mirror_dir}" ]] || [[ -z "${mirror_dir}" ]] ;then
    exit 1
 fi
 
-if [[ $(whoami) == "root" ]] ;then
-  echo "You must not run this script as root"
-  exit 1
-fi
+# Optional user run protection, uncomment and put user of your choice
+#if [[ $(whoami) == "root" ]] ;then
+#  echo "You must not run this script as root"
+#  exit 1
+#fi
 
 # Loop over directories in $mirror_dir and
 # if they are valid git mirrors (have a 'HEAD' file in them).
